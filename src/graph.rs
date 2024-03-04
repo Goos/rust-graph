@@ -1,10 +1,13 @@
 use std::hash::Hash;
 
-pub trait Graph<K, V>
+pub trait Graph<'a, K, V>
 where
-    K: Copy + Hash + Eq,
-    V: PartialEq
+    K: Copy + Hash + Eq + 'a,
+    V: PartialEq + 'a
 {
+    /// An iterator that iterates over the edges of a node in the graph.
+    type EdgeIterator: DoubleEndedIterator<Item = &'a K>;
+
     /// Inserts a node into the graph, returning the key it was inserted by.
     /// # Arguments
     /// * `node` - the node to insert into the graph.
@@ -30,7 +33,7 @@ where
     /// Returns the node and its edges in the graph, given its key, if it exists, otherwise `None`.
     /// # Arguments
     /// * `key` - the key to return the node and edges for
-    fn get(&self, key: &K) -> Option<(&V, &Vec<K>)>;
+    fn get(&'a self, key: &K) -> Option<(&V, Self::EdgeIterator)>;
 
     /// Returns the value of a node in the graph, given its key, if it exists, otherwise `None`.
     /// # Arguments
@@ -40,5 +43,5 @@ where
     /// Returns the edges of a node in the graph, given its key, if it exists, otherwise `None`.
     /// # Arguments
     /// * `key` - the key of the node to return the edges for
-    fn get_edges(&self, key: &K) -> Option<&Vec<K>>;
+    fn get_edges(&'a self, key: &K) -> Option<Self::EdgeIterator>;
 }

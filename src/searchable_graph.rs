@@ -1,5 +1,7 @@
-use std::collections::{HashSet, VecDeque};
+use num::traits::Zero;
+use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 use std::hash::Hash;
+use std::ops::Add;
 
 use crate::graph::Graph;
 use crate::weighted_graph::WeightedGraph;
@@ -32,17 +34,17 @@ where T: Copy
     }
 }
 
-pub trait SearchableGraph<K, V>: Graph<K, V>
+pub trait SearchableGraph<'a, K, V>: Graph<'a, K, V>
 where
-    K: Copy + Hash + Eq,
-    V: PartialEq
+    K: Copy + Hash + Eq + 'a,
+    V: PartialEq + 'a
 {
     /// Returns the first path found between two nodes in the graph,
     /// doing a depth-first search.
     /// # Arguments
     /// * `source` - the key of the source node for the connection.
     /// * `destination` - the key of the destination node for the connection.
-    fn find_path_dfs(&self, source: &K, destination: &K) -> Option<Vec<K>> {
+    fn find_path_dfs(&'a self, source: &K, destination: &K) -> Option<Vec<K>> {
         let mut visited: Vec<K> = vec![];
         let mut stack: Vec<LinkedNode<K>> = vec![];
         stack.push(LinkedNode::new(source.clone()));
@@ -53,7 +55,7 @@ where
                 if &node.value == destination {
                     return Some(node.flatten());
                 } else if let Some(edges) = self.get_edges(&node.value) {
-                    for edge in edges.iter().rev() {
+                    for edge in edges.rev() {
                         let mut edge_node = LinkedNode::new(edge.clone());
                         edge_node.parent = Some(Box::new(node.clone()));
                         stack.push(edge_node);
@@ -70,7 +72,7 @@ where
     /// # Arguments
     /// * `source` - the key of the source node for the connection.
     /// * `destination` - the key of the destination node for the connection.
-    fn find_path_bfs(&self, source: &K, destination: &K) -> Option<Vec<K>> {
+    fn find_path_bfs(&'a self, source: &K, destination: &K) -> Option<Vec<K>> {
         let mut visited: HashSet<K> = HashSet::new();
         let mut queue: VecDeque<LinkedNode<K>> = VecDeque::new();
         queue.push_front(LinkedNode::new(source.clone()));
@@ -94,20 +96,11 @@ where
     }
 }
 
-impl<T, K, V> SearchableGraph<K, V> for T
+impl<'a, T, K, V> SearchableGraph<'a, K, V> for T
 where
-    T: Graph<K, V>,
-    K: Copy + Hash + Eq,
-    V: PartialEq
+    T: Graph<'a, K, V>,
+    K: Copy + Hash + Eq + 'a,
+    V: PartialEq + 'a
 {
 }
 
-impl<K, V, W> dyn WeightedGraph<K, V, W> {
-    pub fn find_shortest_path(
-        &self, 
-        source: &K, 
-        destination: &K
-    ) -> Option<Vec<(K, W)>> {
-        None
-    }
-}
