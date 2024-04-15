@@ -1,8 +1,6 @@
-use std::hash::Hash;
-
 pub trait Graph<'a, K, V>
 where
-    K: Copy + Hash + Eq + 'a,
+    K: Copy + Eq + 'a,
     V: PartialEq + 'a
 {
     /// An iterator that iterates over the edges of a node in the graph.

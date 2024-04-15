@@ -48,7 +48,7 @@ impl Zero for NoWeight {
 
 pub trait WeightedGraph<'a, K, V, W>: Graph<'a, K, V> 
 where
-    K: Copy + Hash + Eq + 'a,
+    K: Copy + Eq + 'a,
     V: PartialEq + 'a,
     W: 'a
 {
