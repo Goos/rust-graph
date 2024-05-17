@@ -1,6 +1,5 @@
 use num::traits::Zero;
 use std::cmp::Ordering;
-use std::hash::Hash;
 use std::ops::Add;
 
 use crate::graph::Graph;
